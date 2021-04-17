@@ -15,8 +15,7 @@ struct Output {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let first_arg = args[0].clone();
-    let command = Path::new(&first_arg).file_name().unwrap();
+    let command = Path::new(&args[0]).file_name().unwrap();
     if command == OsStr::new("bee") {
         let (arg_0, cmd_args) = args.split_at(2);
         run_command(&arg_0[1], cmd_args)
