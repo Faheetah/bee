@@ -18,32 +18,19 @@ fn main() {
     let first_arg = args[0].clone();
     let command = Path::new(&first_arg).file_name().unwrap();
     if command == OsStr::new("bee") {
-        run_command(args)
+        let (arg_0, cmd_args) = args.split_at(2);
+        run_command(&arg_0[1], cmd_args)
     } else {
-        run_wrapped_command(args)
+        let (arg_0, cmd_args) = args.split_at(1);
+        let command = Path::new(&arg_0[0]).file_name().unwrap();
+        let s = command.to_str().unwrap().to_owned();
+        run_command(&s, cmd_args)
     }
 }
 
-fn run_command(args: Vec<String>) {
-    let (arg_0, cmd_args) = args.split_at(2);
-    let output = Command::new(&arg_0[1])
-        .args(cmd_args)
-        .output()
-        .expect("failed to execute process");
-    let data = Output {
-        rc: output.status.code().unwrap(),
-        stdout: parse_std_message(output.stdout),
-        stderr: parse_std_message(output.stderr),
-    };
-    let json_string = serde_json::to_string_pretty(&data);
-    println!("{}", json_string.unwrap())
-}
-
-fn run_wrapped_command(args: Vec<String>) {
-    let (arg_0, cmd_args) = args.split_at(2);
-    let command = Path::new(&arg_0[0]).file_name().unwrap();
-    let output = Command::new(command)
-        .args(cmd_args)
+fn run_command(cmd: &String, args: &[String]) {
+    let output = Command::new(cmd)
+        .args(args)
         .output()
         .expect("failed to execute process");
     let data = Output {
